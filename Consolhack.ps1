@@ -105,7 +105,7 @@ function ScrollListMenu($inputObject) {
         $key = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
         # arrow keys move the title, and letters are presented in the middle of the screen
         Switch($key.virtualKeyCode){
-            38 {if($table.slice[0]+1+$tableslice -lt $objlen ){
+            40 {if($table.slice[0]+1+$tableslice -lt $objlen ){
                 $table.cleanup();
                 $table.slice[0] +=1; 
                 $table.slice[1] +=1;  
@@ -114,7 +114,7 @@ function ScrollListMenu($inputObject) {
                 $scrollbarLoc.y = $tabley + [int](($tableslice * $table.slice[0])/$objlen);
                 $objects += $scrollbar;
                 $objects += $scrollbarloc  }}
-            40 {if($table.slice[0]-1 -gt 0 ){
+            38 {if($table.slice[0]-1 -gt 0 ){
                 $table.cleanup();
                 $table.slice[0] -=1; 
                 $table.slice[1] -=1; 
