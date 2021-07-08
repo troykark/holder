@@ -7,12 +7,12 @@ $global:e = [char]27
 #"$e[5;36mThisIsAScript${e}[0m"
 
 $asciiTitle = @(                                            
-    ' _   __  ___  ______  _   __ _   _  _____  _   _  _____  _      _     ',
-    '| | / / / _ \ | ___ \| | / /| | | |/  ___|| | | ||  ___|| |    | |    ',
-    '| |/ / / /_\ \| |_/ /| |/ / | | | |\ `--. | |_| || |__  | |    | |    ',
-    '|    \ |  _  ||    / |    \ | | | | `--. \|  _  ||  __| | |    | |    ',
-    '| |\  \| | | || |\ \ | |\  \| |_| |/\__/ /| | | || |___ | |____| |____',
-    '\_| \_/\_| |_/\_| \_|\_| \_/ \___/ \____/ \_| |_/\____/ \_____/\_____/')
+    " _   __  ___  ______  _   __ _   _  _____  _   _  _____  _      _     ",
+    "| | / / / _ \ | ___ \| | / /| | | |/  ___|| | | ||  ___|| |    | |    ",
+    "| |/ / / /_\ \| |_/ /| |/ / | | | |\ `--. | |_| || |__  | |    | |    ",
+    "|    \ |  _  ||    / |    \ | | | | `--. \|  _  ||  __| | |    | |    ",
+    "| |\  \| | | || |\ \ | |\  \| |_| |/\__/ /| | | || |___ | |____| |____",
+    "\_| \_/\_| |_/\_| \_|\_| \_/ \___/ \____/ \_| |_/\____/ \_____/\_____/")
                                                                                      
                                                                                     
 # Colors h
@@ -21,6 +21,10 @@ $asciiTitle = @(
 #    "$e[5;36mThisIsAScript${e}[0m"
 #
 #}
+function ListMenu (){
+    
+
+}
 
 Class drawObject {
     [int]$x
@@ -121,21 +125,25 @@ $objects = @($titleObject, $keypress,$report,$enter)
 clear-display
 $borderAscii
 $e = [char]27
-while($true){
-    $key = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
-    # arrow keys move the title, and letters are presented in the middle of the screen
-    Switch($key.virtualKeyCode){
-        37 {$titleObject.cleanup() ;$titleObject.x -=1; $titleObject.color += 1;$objects +=$titleObject }
-        38 {$report.slice[0] +=1; $report.slice[1] +=1; ; $report.color = 6; $objects += $report }
-        39 {$titleObject.cleanup(); $titleObject.x +=1; $titleObject.color += 1;$objects += $titleObject }
-        40 {$report.slice[0] -=1; $report.slice[1] -=1; $report.color = 5; $objects += $report}
-        8 {$keypress.ascii = @(' ');$keypress.drawstring();$keypress.x -=1; $objects+= $keypress }
-        default {$keypress.ascii = @($key.character);$keypress.drawstring(); $keypress.x += 1 }
-    }
-    Screen-Blit $objects
-    $objects = @()
+function TestMenu ($titleObject, $keypress,$report,$enter) {
+    $objects = @($titleObject, $keypress,$report,$enter)
+    while($true){
+        
+        $key = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
+        # arrow keys move the title, and letters are presented in the middle of the screen
+        Switch($key.virtualKeyCode){
+            37 {$titleObject.cleanup() ;$titleObject.x -=1; $titleObject.color += 1;$objects +=$titleObject }
+            38 {$report.slice[0] +=1; $report.slice[1] +=1; ; $report.color = 6; $objects += $report }
+            39 {$titleObject.cleanup(); $titleObject.x +=1; $titleObject.color += 1;$objects += $titleObject }
+            40 {$report.slice[0] -=1; $report.slice[1] -=1; $report.color = 5; $objects += $report}
+            8 {$keypress.ascii = @(' ');$keypress.drawstring();$keypress.x -=1; $objects+= $keypress }
+            default {$keypress.ascii = @($key.character);$keypress.drawstring(); $keypress.x += 1 }
+        }
+        Screen-Blit $objects
+        $objects = @()
 }
-
+}
+testMenu $titleObject $keypress $report $enter
 
 #while($true){
 #    $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
