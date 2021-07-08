@@ -73,10 +73,16 @@ Class drawObject {
 
 #Menu Functions
 function ScrollListMenu($inputObject) {
-    $tableX = 3
+    $longestentry = 0
+    foreach($o in $inputobject){
+        if($o.length -gt $longestentry){
+            $longestEntry= $o.length 
+        }
+    }
+    $tableX = [int]($global:consoleMX / 2) - [int]($longestEntry / 2)
     $tableY = 3
     $objlen = $inputobject.length
-    $tableMX= 0
+    $tableMX= $tableX + $longestEntry
     $tableMY= $global:consoleMY -5
     foreach($o in $inputobject){
         if($o.length -gt ($tableMX - $tableX)){
