@@ -1,30 +1,18 @@
 #https://stackoverflow.com/questions/20705102/how-to-colorise-powershell-output-of-format-table
 #https://duffney.io/usingansiescapesequencespowershell/
 #$Dollars = "Look at this color"
-$global:e = [char]27
+
 #foreach($n in (1..7 + 30..37 + 90..96)){write-host $n; "$e[${n}m$Dollars${e}[0m"}
 
 #"$e[5;36mThisIsAScript${e}[0m"
 
-$asciiTitle = @(                                            
-    " _   __  ___  ______  _   __ _   _  _____  _   _  _____  _      _     ",
-    "| | / / / _ \ | ___ \| | / /| | | |/  ___|| | | ||  ___|| |    | |    ",
-    "| |/ / / /_\ \| |_/ /| |/ / | | | |\ `--. | |_| || |__  | |    | |    ",
-    "|    \ |  _  ||    / |    \ | | | | `--. \|  _  ||  __| | |    | |    ",
-    "| |\  \| | | || |\ \ | |\  \| |_| |/\__/ /| | | || |___ | |____| |____",
-    "\_| \_/\_| |_/\_| \_|\_| \_/ \___/ \____/ \_| |_/\____/ \_____/\_____/")
-                                                                                     
-                                                                                    
+                                                                        
 # Colors h
 #foreach($num in 0..80){
 #
 #    "$e[5;36mThisIsAScript${e}[0m"
 #
 #}
-function ListMenu (){
-    
-
-}
 
 Class drawObject {
     [int]$x
@@ -52,7 +40,7 @@ Class drawObject {
     [string[]] cleanup() {
         $global:buffer = $null
         $global:y = $this.y
-        foreach($l in $this.ascii){
+        foreach($l in $this.ascii[$this.slice[0]..$this.slice[1]]){
             #$global:buffer += $global:e + "[" + $global:y + ";" + $this.x + "H" + $global:e + "[" + $this.color + "m" + (" " * $l.Length) + $global:e +"[0m"
             write-host ($global:e + "[" + $global:y + ";" + $this.x + "H" + $global:e + "[" + $this.color + "m" + (" " * $l.Length) + $global:e +"[0m")
             $global:y +=1
@@ -82,6 +70,91 @@ Class drawObject {
     }
 }
 
+
+#Menu Functions
+function ScrollListMenu($inputObject) {
+    $tableX = 3
+    $tableY = 3
+    $objlen = $inputobject.length
+    $tableMX= 0
+    $tableMY= $global:consoleMY -5
+    foreach($o in $inputobject){
+        if($o.length -gt ($tableMX - $tableX)){
+            $tableMX = $o.length + $tableX
+        }
+    }
+    $scrollbar = @()
+    $tableSlice = $tableMY - $tableY -1
+    foreach($o in 0..$tableSlice){
+        $scrollbar += '|'
+    }
+    $menu =  [drawObject]::new($tableX,$tableMY+1,@('Use Object Number to Select Object:'),36)
+    $scrollbar = [drawObject]::new($tableMX+1,$tabley,$scrollbar,36)
+    $table = [drawObject]::new($tablex,$tableY,$inputObject,36)
+    $scrollbarLoc = [drawObject]::new($tableMX+1,$tableY,@('^','v'),36)
+    $table.strsubset = $true
+    $table.slice[1] = $tableSlice 
+    $objects = ($table, $menu, $scrollbar, $scrollbarLoc)
+    while($true){
+        $key = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
+        # arrow keys move the title, and letters are presented in the middle of the screen
+        Switch($key.virtualKeyCode){
+            38 {if($table.slice[0]+1+$tableslice -lt $objlen ){
+                $table.cleanup();
+                $table.slice[0] +=1; 
+                $table.slice[1] +=1;  
+                $objects += $table;
+                $scrollbarLoc.cleanup();
+                $scrollbarLoc.y = $tabley + [int](($tableslice * $table.slice[0])/$objlen);
+                $objects += $scrollbar;
+                $objects += $scrollbarloc  }}
+            40 {if($table.slice[0]-1 -gt 0 ){
+                $table.cleanup();
+                $table.slice[0] -=1; 
+                $table.slice[1] -=1; 
+                $objects += $table;
+                $scrollbarLoc.cleanup();
+                $scrollbarLoc.y = $tabley + [int](($tableslice * $table.slice[0])/$objlen);
+                $objects += $scrollbar;
+                $objects += $scrollbarloc  }}
+            default {}
+        }
+        Screen-Blit $objects
+        $objects = @()
+    }
+}
+
+#General Functions live here
+#clear-display
+function clear-display(){
+    "$e[2J${e}[t${e}[0m"
+}
+
+function Screen-Blit($objectArray){
+    $buffer = @()
+    
+    #Takes updates objects from the object array and draws them.
+        foreach($obj in $objectArray){
+            $obj.drawString()
+        }
+    return $buffer
+}
+###Globals 
+$global:e = [char]27
+
+$global:consoleMX = $host.ui.rawui.buffersize.width
+$global:consoleMY = $host.ui.rawui.buffersize.height
+##########################################Test Setup and initialization 
+$asciiTitle = @(                                            
+    " _   __  ___  ______  _   __ _   _  _____  _   _  _____  _      _     ",
+    "| | / / / _ \ | ___ \| | / /| | | |/  ___|| | | ||  ___|| |    | |    ",
+    "| |/ / / /_\ \| |_/ /| |/ / | | | |\ `--. | |_| || |__  | |    | |    ",
+    "|    \ |  _  ||    / |    \ | | | | `--. \|  _  ||  __| | |    | |    ",
+    "| |\  \| | | || |\ \ | |\  \| |_| |/\__/ /| | | || |___ | |____| |____",
+    "\_| \_/\_| |_/\_| \_|\_| \_/ \___/ \____/ \_| |_/\____/ \_____/\_____/")
+                                                                                     
+            
+$objects = @($titleObject, $keypress,$report,$enter)
 $TitleObject = [drawObject]::new(5,5,$asciiTitle,92)
 # Example of class execution
 #$titleObject3 = [drawObject]::new(20, 20, @('dogs','Elves'), 92)
@@ -94,6 +167,7 @@ $report.slice = (0,8)
 ############  This creates the border object and assigns it to whatever
 $ymax = $host.ui.rawui.WindowSize.Height - 1
 $xmax = $host.ui.rawui.WindowSize.Width
+               
 $borderAscii = ''
 foreach($y in 1..$ymax){
     foreach($x in 1..$xmax){
@@ -101,29 +175,10 @@ foreach($y in 1..$ymax){
             $borderAscii+="$e[${y};${x}H${e}[7m#$e[0m"
             }
         }
-    }                   
-
-# Functions live here
-#clear-display
-function clear-display(){
-    "$e[2J${e}[t${e}[0m"
-}
-
-
-function Screen-Blit($objectArray){
-    $buffer = @()
-    
-    #Takes updates objects from the object array and draws them.
-        foreach($obj in $objectArray){
-            $obj.drawString()
-        }
-    return $buffer
-}
-
-#Setup and initialization 
-$objects = @($titleObject, $keypress,$report,$enter)
+    }   
+[console]::CursorVisible = $false
 clear-display
-$borderAscii
+#$borderAscii
 $e = [char]27
 function TestMenu ($titleObject, $keypress,$report,$enter) {
     $objects = @($titleObject, $keypress,$report,$enter)
@@ -141,10 +196,12 @@ function TestMenu ($titleObject, $keypress,$report,$enter) {
         }
         Screen-Blit $objects
         $objects = @()
+    }
 }
-}
-testMenu $titleObject $keypress $report $enter
+#testMenu $titleObject $keypress $report $enter
+$obj = ((get-service | foreach{$_.name} | out-string).Split([Environment]::NewLine, [StringSplitOptions]::RemoveEmptyEntries))
 
+ScrollListMenu($obj)
 #while($true){
 #    $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
 #}
