@@ -98,31 +98,75 @@ function ScrollListMenu($inputObject) {
     $scrollbar = [drawObject]::new($tableMX+1,$tabley,$scrollbar,36)
     $table = [drawObject]::new($tablex,$tableY,$inputObject,36)
     $scrollbarLoc = [drawObject]::new($tableMX+1,$tableY,@('^','v'),36)
+    $selector = [drawObject]::new($tablex,$tabley,@($table.ascii[0]),6)
     $table.strsubset = $true
     $table.slice[1] = $tableSlice 
-    $objects = ($table, $menu, $scrollbar, $scrollbarLoc)
+    $objects = ($table, $menu, $scrollbar, $scrollbarLoc,$selector)
+    $selectorloc = 0
+    Screen-blit $objects
     while($true){
         $key = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
         # arrow keys move the title, and letters are presented in the middle of the screen
         Switch($key.virtualKeyCode){
             40 {if($table.slice[0]+1+$tableslice -lt $objlen ){
-                $table.cleanup();
-                $table.slice[0] +=1; 
-                $table.slice[1] +=1;  
-                $objects += $table;
-                $scrollbarLoc.cleanup();
-                $scrollbarLoc.y = $tabley + [int](($tableslice * $table.slice[0])/$objlen);
-                $objects += $scrollbar;
-                $objects += $scrollbarloc  }}
-            38 {if($table.slice[0]-1 -gt 0 ){
-                $table.cleanup();
-                $table.slice[0] -=1; 
-                $table.slice[1] -=1; 
-                $objects += $table;
-                $scrollbarLoc.cleanup();
-                $scrollbarLoc.y = $tabley + [int](($tableslice * $table.slice[0])/$objlen);
-                $objects += $scrollbar;
-                $objects += $scrollbarloc  }}
+                    $table.cleanup();
+                    $objects += $table;
+                    $scrollbarLoc.cleanup();
+                    $scrollbarLoc.y = $tabley + [int](($tableslice * $table.slice[0])/$objlen);
+                    $objects += $scrollbar;
+                    $objects += $scrollbarloc;
+                    $selector.cleanup()
+                    $selectorloc += 1
+                    if($selector.y -lt ($tabley + ($tableSlice / 2))){
+                        $selector.y  += 1  
+                    }
+                    else{
+                        $table.slice[0] +=1; 
+                        $table.slice[1] +=1;  
+                    }
+                    $selector.ascii[0] = $table.ascii[$selectorloc]
+                    $objects += $selector
+                }
+                elseif($selectorloc -lt $objlen-1){
+                    $table.cleanup();
+                    $objects += $table;
+                    $selector.cleanup()
+                    $selectorloc += 1
+                    $selector.y  += 1  
+                    $selector.ascii[0] = $table.ascii[$selectorloc]
+                    $objects += $selector
+                 }
+            }
+            38 {
+                if($table.slice[0]-1 -gt 0 ){
+                    $table.cleanup();
+                    $objects += $table;
+                    $scrollbarLoc.cleanup();
+                    $scrollbarLoc.y = $tabley + [int](($tableslice * $table.slice[0])/$objlen);
+                    $objects += $scrollbar;
+                    $objects += $scrollbarloc
+                    $selector.cleanup()
+                    $selectorloc -= 1
+                    if($selector.y -gt ($tabley + ($tableSlice / 2))){
+                        $selector.y  -= 1  
+                    }
+                    else{
+                        $table.slice[0] -=1; 
+                        $table.slice[1] -=1;  
+                    }
+                $selector.ascii[0] = $table.ascii[$selectorloc]
+                $objects += $selector
+            }
+                elseif($selectorloc -gt 0){
+                    $table.cleanup();
+                    $objects += $table;
+                    $selector.cleanup()
+                    $selectorloc -= 1
+                    $selector.y  -= 1  
+                    $selector.ascii[0] = $table.ascii[$selectorloc]
+                    $objects += $selector
+                 }
+                }
             default {}
         }
         Screen-Blit $objects
