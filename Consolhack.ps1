@@ -94,11 +94,11 @@ function ScrollListMenu($inputObject) {
     foreach($o in 0..$tableSlice){
         $scrollbar += '|'
     }
-    $menu =  [drawObject]::new($tableX,$tableMY+1,@('Use Object Number to Select Object:'),36)
+    $menu =  [drawObject]::new($tableX,$tableMY+1,@('Press ENTER to select'),36)
     $scrollbar = [drawObject]::new($tableMX+1,$tabley,$scrollbar,36)
     $table = [drawObject]::new($tablex,$tableY,$inputObject,36)
-    $scrollbarLoc = [drawObject]::new($tableMX+1,$tableY,@('^','v'),36)
-    $selector = [drawObject]::new($tablex,$tabley,@($table.ascii[0]),6)
+    $scrollbarLoc = [drawObject]::new($tableMX+1,$tableY,@('#','#'),36)
+    $selector = [drawObject]::new($tablex,$tabley,@($table.ascii[0]),93)
     $table.strsubset = $true
     $table.slice[1] = $tableSlice 
     $objects = ($table, $menu, $scrollbar, $scrollbarLoc,$selector)
@@ -167,6 +167,7 @@ function ScrollListMenu($inputObject) {
                     $objects += $selector
                  }
                 }
+            13 { return $table.ascii[$selectorloc]}
             default {}
         }
         Screen-Blit $objects
@@ -249,8 +250,8 @@ function TestMenu ($titleObject, $keypress,$report,$enter) {
     }
 }
 #testMenu $titleObject $keypress $report $enter
-$obj = ((get-service | foreach{$_.name} | out-string).Split([Environment]::NewLine, [StringSplitOptions]::RemoveEmptyEntries))
-
+#$obj = ((get-process | foreach{$_.name} | out-string).Split([Environment]::NewLine, [StringSplitOptions]::RemoveEmptyEntries))
+$obj = ((get-childitem| foreach{$_.name} | out-string).Split([Environment]::NewLine, [StringSplitOptions]::RemoveEmptyEntries))
 ScrollListMenu($obj)
 #while($true){
 #    $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
