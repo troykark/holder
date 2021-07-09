@@ -72,6 +72,10 @@ Class drawObject {
 
 
 #Menu Functions
+function Multiplechoice($choicesTupleArray) {
+       $
+
+} 
 function ScrollListMenu($inputObject) {
     $longestentry = 0
     foreach($o in $inputobject){
@@ -86,7 +90,7 @@ function ScrollListMenu($inputObject) {
     $tableMY= $global:consoleMY -5
     foreach($o in $inputobject){
         if($o.length -gt ($tableMX - $tableX)){
-            $tableMX = $o.length + $tableX
+            $tableMX = $o.length + $tableX 
         }
     }
     $scrollbar = @()
