@@ -76,7 +76,7 @@ function Multiplechoice($choicesTupleArray) {
        $
 
 } 
-function ScrollListMenu($inputObject) {
+function ScrollListMenu($inputObject, $x) {
     $longestentry = 0
     foreach($o in $inputobject){
         if($o.length -gt $longestentry){
@@ -171,7 +171,7 @@ function ScrollListMenu($inputObject) {
                     $objects += $selector
                  }
                 }
-            13 { return $table.ascii[$selectorloc]}
+            13 { $global:x = $table.ascii[$selectorloc]; return}
             default {}
         }
         Screen-Blit $objects
@@ -192,7 +192,7 @@ function Screen-Blit($objectArray){
         foreach($obj in $objectArray){
             $obj.drawString()
         }
-    return $buffer
+     return $buffer
 }
 ###Globals 
 $global:e = [char]27
@@ -255,8 +255,10 @@ function TestMenu ($titleObject, $keypress,$report,$enter) {
 }
 #testMenu $titleObject $keypress $report $enter
 #$obj = ((get-process | foreach{$_.name} | out-string).Split([Environment]::NewLine, [StringSplitOptions]::RemoveEmptyEntries))
-$obj = ((get-childitem| foreach{$_.name} | out-string).Split([Environment]::NewLine, [StringSplitOptions]::RemoveEmptyEntries))
-ScrollListMenu($obj)
+$obj = ((get-service| foreach{$_.name} | out-string).Split([Environment]::NewLine, [StringSplitOptions]::RemoveEmptyEntries))
+$global:x = $null
+ScrollListMenu $obj $x 
+
 #while($true){
 #    $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
 #}
